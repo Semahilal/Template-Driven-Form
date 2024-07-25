@@ -1,0 +1,218 @@
+
+
+<style>
+  .main{
+    text-align: center;
+    margin-top: 10%;
+  }
+
+  .custom-margin {
+  margin-bottom: 3rem;
+}
+</style>
+
+<main class="main">
+  
+
+  <p-button (click)="showDialog()" label="Add - Template"  /><br><br><br>
+  <p-dialog header="Add/Edit Person - Template" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    
+    <div class="flex align-items-center gap-3 mb-3">
+    <form name="form"  #f="ngForm" >
+      <div class="custom-margin">
+      <span>Name  : </span>
+      <input type="text" pInputText class="form-control " name="name" [(ngModel)]="model.name"  #name="ngModel"
+      required  /> 
+      <div *ngIf="name.invalid && (name.touched || name.dirty)" class="invalid-feedback">
+        <div>First Name is required</div>
+      </div>
+    </div>
+    
+    <div class="custom-margin">
+      <span>Surname: </span>
+            <input type="text" pInputText class="form-control" name="surname" [(ngModel)]="model.surname"  #surname="ngModel" 
+             required />
+      <div *ngIf="surname.invalid && (surname.touched || surname.dirty)" class="invalid-feedback">
+        <div >Surname is required</div>
+    </div>
+    </div> 
+    
+    <div class="custom-margin">
+      <span>Age: </span>
+      <p-inputNumber inputId="integeronly" class="form-control" [(ngModel)]="model.age" name="age" #age="ngModel" required /> 
+      <div *ngIf="age.invalid && (age.touched || age.dirty)" class="invalid-feedback">
+        <div >Age is required</div>
+    </div>
+    </div> 
+   
+    <div class="custom-margin">
+      <span>City:</span>
+      <p-dropdown class="p-dropdown"
+      class="form-control"
+      required
+      [(ngModel)]="model.selectedCity" name="selectedCity"
+      #selectedCity="ngModel"
+      [options]="cities" 
+     
+      optionLabel="label" 
+      (onChange)="filterCities($event.value)"
+      placeholder="Select a City" 
+      [showClear]="true"
+      
+      /><div *ngIf="selectedCity.invalid && (selectedCity.dirty || selectedCity.touched)" class="invalid-feedback">
+        <small class="text-danger">Please select a city</small>
+      </div>
+    </div>
+    
+
+    <div class="custom-margin">
+      <span> Situation: </span>
+      <p-dropdown
+      class="form-control"
+      [(ngModel)]="model.selectedoption" name="selectedoption"
+      #selectedoption="ngModel"
+      [options]="situations" 
+      required
+      optionLabel="label2" 
+      placeholder="Select Situation"
+      (onChange)="filtersituations($event.value)"
+      [showClear]="true" 
+      /><div *ngIf="selectedoption.invalid && (selectedoption.dirty || selectedoption.touched)" class="invalid-feedback">
+        <small class="text-danger">Please select an option</small>
+      </div>
+    </div>
+   
+         
+    <div class="flex justify-content-end gap-2">
+ 
+        <p-button label="Cancel" severity="secondary" (click)="visible = false; f.resetForm()" ></p-button>
+        <p-button label="Save" id="label1" [disabled]="f.invalid" (click)="saveAndHide(); f.resetForm()"  />
+
+    </div>
+  </form>
+</div>
+    
+    
+</p-dialog>
+
+
+
+<p-table [value]="filteredPeople" 
+  [tableStyle]="{ 'min-width': '50rem' }"
+  [paginator]="true"
+  [rows]="5"
+  styleClass="p-datatable-gridlines" 
+  
+ 
+  
+  >
+  <ng-template pTemplate="header">
+        <tr  >
+            <td style=" font-weight: bold;">ID</td>
+            <td style=" font-weight: bold;">Name</td>
+            <td style=" font-weight: bold;">Surname</td>
+            <td style=" font-weight: bold;">Age</td>
+            <td style=" font-weight: bold;">City</td>
+            <td style=" font-weight: bold;">Situation</td>
+            <td style=" font-weight: bold;">Drop</td>
+            <td style=" font-weight: bold;">Edit</td>
+        </tr>
+        <tr>
+          <th></th>
+          <th>
+              <p-columnFilter 
+                  type="text"
+                  field="name" 
+                  placeholder="Search by name" 
+                  ariaLabel="Filter Name" />
+          </th>
+          <th>
+              <p-columnFilter 
+                  type="text"
+                  field="surname"
+                  placeholder="Search by surname" 
+                  ariaLabel="Filter surname" />
+          </th>
+          <th>
+            <p-columnFilter 
+            type="text"
+            field="age"
+            placeholder="Search by age" 
+            ariaLabel="Filter age" />
+            
+          </th>
+          <th>
+            <p-columnFilter field="city" matchMode="equals" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-dropdown 
+                      [(ngModel)]="selectedCity" 
+                      [options]="cities"
+                      
+                      (onChange)="filterCities($event.value)" 
+                      placeholder="Select One"
+                      [showClear]="true"
+                   >
+                   
+                          <ng-template let-option pTemplate="item" >
+                            <ng-container *ngIf="option">
+                              <p-tag 
+                              [value]="option.value" 
+                            />
+                            </ng-container>
+                              
+                          </ng-template>
+                          
+                  </p-dropdown>
+                  
+              </ng-template>
+          </p-columnFilter>
+          </th>
+
+          <th>
+            <p-columnFilter field="situations" matchMode="equals" [showMenu]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-dropdown 
+                      [(ngModel)]="selectedoption" 
+                      [options]="situations"
+                      
+                      
+                      (onChange)="filtersituations($event.value)" 
+                      placeholder="Select One" 
+                      [showClear]="true">
+                          <ng-template let-option pTemplate="item">
+                            <ng-container *ngIf="option">
+                              <p-tag 
+                              [value]="option.value" 
+                            />
+                            </ng-container>
+                          </ng-template>
+                  </p-dropdown>
+              </ng-template>
+          </p-columnFilter>
+          </th>
+          <th></th>
+          <th></th>
+      </tr>
+  </ng-template>
+    
+    <ng-template pTemplate="body" let-data >
+        <tr>
+            <td>{{ data.id }}</td>   
+            <td>{{ data.name }}</td>
+            <td>{{ data.surname }}</td>
+            <td>{{ data.age }}</td>
+            <td>{{ data.selectedCity?.label }}</td>
+            <td>{{ data.selectedoption?.label2 }}</td>
+            <td><p-button type="onSubmit" label="Drop" (click)="removePerson(data)"  /></td>
+            <td><p-button type="onSubmit" label="Edit" (click)="showDialog(data.id)" /></td>
+            
+        </tr>
+    </ng-template>
+    
+</p-table>
+
+
+</main>
+
+
+
